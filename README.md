@@ -11,7 +11,7 @@ Enhancing practical low light raw images is a difficult task due to severe noise
 
 
 ## Links
-- Nikon Camera Dataset: [Kaggle Link]()
+Nikon Camera Dataset: [Kaggle Link](https://www.kaggle.com/datasets/razorblade/nikon-camera-dataset)
 - Sony Camera Dataset (SID): [Drive](https://storage.googleapis.com/isl-datasets/SID/Sony.zip)
 - Fuji Camera Dataset (SID): [Drive](https://storage.googleapis.com/isl-datasets/SID/Fuji.zip)
 - Canon Camera Dataset: [GitHub](https://github.com/jconenna/Canon-6D-Datasets-For-Learning-to-See-in-the-Dark)
@@ -29,5 +29,5 @@ Testing :
 2. We use pack_nikon for Nikon validation and pack_canon for Canon validation.
 
 Model:
-1. UnetConverter is used for 16-to-8 bit converter.
+1. UnetConverter is for the source Grayscale SSIM 16-to-8 bit conversion. The pretrained Sony 16-to-8 bit converter can be downloaded here: [Google Drive](https://drive.google.com/file/d/17BphXVzG9YKaWxW5qjNZdzV8dqcS-E_S/view?usp=sharing)
 2. UNetSony is used for shared U-net model (N).

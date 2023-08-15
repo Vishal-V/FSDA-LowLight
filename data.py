@@ -89,25 +89,22 @@ class SonyDataset(Dataset):
         self.fns = glob.glob(gt_dir + "0*.ARW")  # file names
 
         self.ids = [int(os.path.basename(fn)[0:5]) for fn in self.fns]
-        # self.ids = [1]
+
         # Raw data takes long time to load. Keep them in memory after loaded.
         self.gt_images = [None] * len(self.ids)
         self.input_images = [None] * len(self.ids)
         self.ratios = [None] * len(self.ids)
-        # self.input_images['300'] = [None] * len(self.ids)
-        # self.input_images['250'] = [None] * len(self.ids)
-        # self.input_images['100'] = [None] * len(self.ids)
-        # self.gt_jpeg_images = [None] * 6000
+
         print("Loading Sony images onto RAM....")
         for i in range(len(self.ids)):
             # input
-            id = self.ids[i]
-            print(id, i)
-            in_files = glob.glob(self.input_dir + "%05d_00*.ARW" % id)
+            index = self.ids[i]
+            print(index, i)
+            in_files = glob.glob(self.input_dir + "%05d_00*.ARW" % index)
             in_path = in_files[np.random.random_integers(0, len(in_files) - 1)]
             in_fn = os.path.basename(in_path)
             # ground truth
-            gt_files = glob.glob(self.gt_dir + "%05d_00*.ARW" % id)
+            gt_files = glob.glob(self.gt_dir + "%05d_00*.ARW" % index)
             gt_path = gt_files[0]
             gt_fn = os.path.basename(gt_path)
             # ratio
@@ -125,37 +122,13 @@ class SonyDataset(Dataset):
             )
             self.gt_images[i] = np.expand_dims(np.float32(im / 65535.0), axis=0)
 
-            # im_jpeg = gt_raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=8)
-            # self.gt_jpeg_images[i] = np.expand_dims(np.float32(im_jpeg / 255.0), axis=0)
         print(f"Loaded all {len(self.ids)} Sony images onto RAM....")
 
     def __len__(self):
         return len(self.ids)
 
     def __getitem__(self, ind):
-        id = self.ids[ind]
-        # in_files = glob.glob(self.input_dir + '%05d_00*.ARW' % id)
-        # in_path = in_files[np.random.random_integers(0, len(in_files) - 1)]
-        # in_fn = os.path.basename(in_path)
-
-        # gt_files = glob.glob(self.gt_dir + '%05d_00*.ARW' % id)
-        # gt_path = gt_files[0]
-        # gt_fn = os.path.basename(gt_path)
-
-        # in_exposure = float(in_fn[9:-5])
-        # gt_exposure = float(gt_fn[9:-5])
-        # ratio = min(gt_exposure / in_exposure, 300)
-
-        # if self.input_images[ind] is None:
-        #     raw = rawpy.imread(in_path)
-        #     self.input_images[ind] = np.expand_dims(pack_raw(raw), axis=0) * ratio
-
-        #     gt_raw = rawpy.imread(gt_path)
-        #     im = gt_raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
-        #     self.gt_images[ind] = np.expand_dims(np.float32(im / 65535.0), axis=0)
-
-        #     im_jpeg = gt_raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=8)
-        #     self.gt_jpeg_images[ind] = np.expand_dims(np.float32(im_jpeg / 255.0), axis=0)
+        index = self.ids[ind]
 
         # crop
         ratio = self.ratios[ind]
@@ -200,12 +173,7 @@ class SonyDataset(Dataset):
         gt_patch = torch.squeeze(gt_patch)
         gt_patch = gt_patch.permute(2, 0, 1)
 
-        # gt_jpeg_patch = torch.from_numpy(gt_jpeg_patch)
-        # gt_jpeg_patch = torch.squeeze(gt_jpeg_patch)
-        # gt_jpeg_patch = gt_jpeg_patch.permute(2, 0, 1)
-
-        # return input_patch, gt_patch, gt_jpeg_patch, id, ratio
-        return input_patch, gt_patch, id, ratio
+        return input_patch, gt_patch, index, ratio
 
 
 class NikonTrainSet(Dataset):
@@ -269,7 +237,7 @@ class NikonTrainSet(Dataset):
             elif set_num == 3:
                 self.ids = [25, 30, 46, 54, 6, 16, 14, 26]  # 25, 30, 54, 6, 16
 
-        elif no_of_items == 10 and random_sample == False:
+        elif no_of_items == 10 and not random_sample:
             if set_num == 1:
                 self.ids = [4, 22, 33, 57, 24, 13, 29, 49, 15, 14]
             elif set_num == 2:
@@ -277,7 +245,7 @@ class NikonTrainSet(Dataset):
             elif set_num == 3:
                 self.ids = [25, 30, 46, 54, 6, 16, 14, 26, 33, 13]  # 25, 30, 54, 6, 16
 
-        elif no_of_items == 10 and random_sample == True:
+        elif no_of_items == 10 and random_sample:
             if set_num == 1:
                 set1_seed = seed - 1
                 random.seed(set1_seed)
@@ -371,8 +339,7 @@ class NikonTrainSet(Dataset):
         print("Loading Nikon images onto RAM....")
         for i in range(len(self.ids)):
 
-            id = self.ids[i]
-            # print (id, i)
+            index = self.ids[i]
             in_files = glob.glob(self.input_dir + "%05d_0*.NEF" % id)
             in_files = sorted(in_files)
 
@@ -387,7 +354,7 @@ class NikonTrainSet(Dataset):
             gt_exposure = float(gt_fn[9:-5])
             ratio = min(gt_exposure / in_exposure, 300)
             self.ratios[i] = ratio
-            print(set_num, id, i, ratio)
+            print(set_num, index, i, ratio)
 
             raw = rawpy.imread(in_path)
             self.input_images[i] = np.expand_dims(pack_nikon(raw), axis=0) * ratio
@@ -407,7 +374,7 @@ class NikonTrainSet(Dataset):
 
     def __getitem__(self, ind):
         ind = ind % 4
-        id = self.ids[ind]
+        index = self.ids[ind]
 
         # crop
         H = self.input_images[ind].shape[1]
@@ -449,7 +416,7 @@ class NikonTrainSet(Dataset):
         gt_patch = torch.squeeze(gt_patch)
         gt_patch = gt_patch.permute(2, 0, 1)
 
-        return input_patch, gt_patch, id, self.ratios[ind]
+        return input_patch, gt_patch, index, self.ratios[ind]
 
 
 class CanonTrainSet(Dataset):
@@ -579,8 +546,8 @@ class CanonTrainSet(Dataset):
 
         print("Loading Canon images into RAM....")
         for i in range(len(self.ids)):
-            id = self.ids[i]
-            print(id, i)
+            index = self.ids[i]
+            print(index, i)
 
             # Input
             in_files = glob.glob(self.input_dir + "%05d_00*.CR2" % id)
@@ -616,7 +583,7 @@ class CanonTrainSet(Dataset):
         return len(self.ids)
 
     def __getitem__(self, ind):
-        id = self.ids[ind]
+        index = self.ids[ind]
 
         # crop
         H = self.input_images[ind].shape[1]
@@ -657,5 +624,5 @@ class CanonTrainSet(Dataset):
         gt_patch = torch.squeeze(gt_patch)
         gt_patch = gt_patch.permute(2, 0, 1)
 
-        return input_patch, gt_patch, id, self.ratios[ind]
+        return input_patch, gt_patch, index, self.ratios[ind]
 

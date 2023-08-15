@@ -324,8 +324,8 @@ if __name__ == '__main__':
     parser.add_argument('--model_load_dir2', type=str, default='./checkpoint/Sony_Canon/approach3/training/')
     parser.add_argument('--model_to_load2', type=str, default='500')
     
-    parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint/Sony_Canon/approach3/PGT/')
-    parser.add_argument('--result_dir', type=str, default='./result_Sony/Sony_Canon/approach3/PGT/')
+    parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint/Sony_Canon/approach3/')
+    parser.add_argument('--result_dir', type=str, default='./result_Sony/Sony_Canon/approach3/')
 
     parser.add_argument('--val_result_dir', type=str, default='./result_Sony/Sony_Canon/approach3/validation/')
     parser.add_argument('--validation_input_dir', type=str, default='./dataset/Canon/short_new/')

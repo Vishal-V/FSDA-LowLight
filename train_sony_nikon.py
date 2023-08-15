@@ -10,7 +10,7 @@ import cv2
 import gc
 
 # Import the Dataset class
-from data2_fast_fuji import SonyDataset, CanonTrainSet
+from data import SonyDataset, NikonTrainSet
 
 import torch
 from torch.utils.data import DataLoader
@@ -174,6 +174,7 @@ def train(args, no_of_items, load_model=False):
 
     target_trainloader_1 = DataLoader(target_trainset_1, batch_size=args.batch_size, shuffle=True, 
                         num_workers=args.num_workers, pin_memory=True, worker_init_fn=worker_init_fn)
+
     log_1.info("Length of source train loader : %d" % len(source_train_loader))
     log_1.info(f'Length of target train loader for set 1 {args.num_target_samples_1} images: {len(target_trainloader_1)}')
 
@@ -218,8 +219,6 @@ def train(args, no_of_items, load_model=False):
             source_input_patch, source_gt_patch = source_input_patch.to(device), source_gt_patch.to(device)
 
             target_input_patch_set1, target_gt_patch_set1, target_train_id_set1, target_ratio_set1  = target_batch_set1
-            # target_input_patch_set2, target_gt_patch_set2, target_train_id_set2, target_ratio_set2  = target_batch_set2
-            # target_input_patch_set3, target_gt_patch_set3, target_train_id_set3, target_ratio_set3  = target_batch_set3
 
             if epoch == 0:
                 log_1.info ('[%d] Target train id set1: %d, ratio : %g' % (i, target_train_id_set1.data.numpy(), target_ratio_set1.data.numpy())) 
@@ -324,8 +323,8 @@ if __name__ == '__main__':
     parser.add_argument('--model_load_dir2', type=str, default='./checkpoint/Sony_Nikon/approach3/training/')
     parser.add_argument('--model_to_load2', type=str, default='500')
     
-    parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint/Sony_Nikon/approach3/PGT/')
-    parser.add_argument('--result_dir', type=str, default='./result_Sony/Sony_Nikon/approach3/PGT/')
+    parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint/Sony_Nikon/approach3/')
+    parser.add_argument('--result_dir', type=str, default='./result_Sony/Sony_Nikon/approach3/')
 
     parser.add_argument('--val_result_dir', type=str, default='./result_Sony/Sony_Nikon/approach3/validation/')
     parser.add_argument('--validation_input_dir', type=str, default='./dataset/Nikon/short_new/')
